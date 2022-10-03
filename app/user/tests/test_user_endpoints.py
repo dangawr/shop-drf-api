@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
 
 
 class PublicUser(APITestCase):
@@ -122,3 +123,7 @@ class RegisteredUser(APITestCase):
         with self.assertRaises(ValueError):
             self.client.patch(reverse('user:me'), updated_data)
 
+    def test_logout_user(self):
+        Token.objects.get_or_create(user=self.user)
+        response = self.client.get(reverse('user:logout'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

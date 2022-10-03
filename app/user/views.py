@@ -1,9 +1,11 @@
 from django.shortcuts import render
+from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from .serializers import UserSerializer, TokenSerializer, UserUpdateSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework import status
 
 
 class CreateUserApiView(CreateAPIView):
@@ -32,3 +34,9 @@ class UpdateUserDetailsApiView(RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
+class LogOutUserApiView(APIView):
+
+    def get(self, request):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
