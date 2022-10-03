@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView
-from .serializers import UserSerializer, TokenSerializer
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
+from .serializers import UserSerializer, TokenSerializer, UserUpdateSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -24,4 +24,11 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email
         })
+
+
+class UpdateUserDetailsApiView(RetrieveUpdateAPIView):
+    serializer_class = UserUpdateSerializer
+
+    def get_object(self):
+        return self.request.user
 

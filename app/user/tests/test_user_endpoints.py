@@ -71,3 +71,54 @@ class PublicUser(APITestCase):
 
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class RegisteredUser(APITestCase):
+
+    def setUp(self) -> None:
+        user_details = {
+            'name': 'Test Name',
+            'email': 'test@example.com',
+            'password': 'test-user-password123',
+        }
+        self.user = get_user_model().objects.create_user(**user_details)
+        self.client.force_authenticate(user=self.user)
+
+    def test_retrieve_user(self):
+        response = self.client.get(reverse('user:me'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            'name': self.user.name,
+            'email': self.user.email
+        })
+
+    def test_change_password(self):
+        updated_data = {
+            'password': 'test-user-password123',
+            'new_password': 'updated',
+            'repeat_new_password': 'updated',
+        }
+        response = self.client.patch(reverse('user:me'), updated_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.user.check_password(updated_data['new_password']))
+
+    def test_change_wrong_password(self):
+        updated_data = {
+            'password': 'wrong_password',
+            'new_password': 'updated',
+            'repeat_new_password': 'updated',
+        }
+
+        with self.assertRaises(ValueError):
+            self.client.patch(reverse('user:me'), updated_data)
+
+    def test_change_wrong_repeat_password(self):
+        updated_data = {
+            'password': 'test-user-password123',
+            'new_password': 'updated',
+            'repeat_new_password': 'wrong_repeat',
+        }
+
+        with self.assertRaises(ValueError):
+            self.client.patch(reverse('user:me'), updated_data)
+
