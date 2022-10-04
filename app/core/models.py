@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.conf import settings
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class MyUserManager(BaseUserManager):
@@ -46,3 +50,35 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
+# class Category(models.Model):
+#     name = models.CharField(max_length=200)
+#     slug = models.SlugField(max_length=200)
+#
+#     class Meta:
+#         ordering = ('name',)
+#         verbose_name = 'category'
+#         verbose_name_plural = 'categories'
+#
+#     def __str__(self):
+#         return self.name
+
+
+class Product(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=150, unique=True, null=False, blank=False)
+    created = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(default=0)
+    is_available = models.BooleanField(default=False)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    description = models.TextField()
+    # category = models.ManyToManyField(Category, related_name='products')
+    # image = models.ImageField(upload_to=product_image)
+
+
+@receiver(post_save, sender=Product)
+def update_is_available(sender, instance, **kwargs):
+    if instance.quantity > 0:
+        instance.is_available = True
