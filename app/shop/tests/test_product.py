@@ -6,6 +6,22 @@ from core.models import Product
 from decimal import Decimal
 
 
+class PublicUserTests(APITestCase):
+
+    def test_get_products(self):
+        response = self.client.get(reverse('shop:product-list'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_post_product(self):
+        payload = {
+            'name': 'test_name',
+            'quantity': 10,
+            'price': Decimal('10.99'),
+            'description': 'some test description',
+        }
+        response = self.client.post(reverse('shop:product-list'), payload)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 class PrivateUserTests(APITestCase):
 
     def setUp(self) -> None:
