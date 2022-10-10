@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
 
     class Meta:
         ordering = ('name',)

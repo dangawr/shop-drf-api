@@ -67,6 +67,20 @@ class PrivateUserTests(APITestCase):
         response = self.client.patch(reverse('shop:product-detail', args=[product.pk]), updated_quantity)
         self.assertFalse(response.data['is_available'])
 
+    def test_create_product_with_existing_category(self):
+        product_payload = {
+            'name': 'test_nameeee',
+            'quantity': 10,
+            'price': Decimal('10.99'),
+            'description': 'some test description',
+            'categories': [{'name': self.category.name}]
+        }
+        response = self.client.post(reverse('shop:product-list'), product_payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        categories_count = Category.objects.count()
+        self.assertEqual(1, categories_count)
+
 
 
 
