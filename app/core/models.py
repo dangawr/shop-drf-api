@@ -51,17 +51,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-# class Category(models.Model):
-#     name = models.CharField(max_length=200)
-#     slug = models.SlugField(max_length=200)
-#
-#     class Meta:
-#         ordering = ('name',)
-#         verbose_name = 'category'
-#         verbose_name_plural = 'categories'
-#
-#     def __str__(self):
-#         return self.name
+class Category(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
+
+    def __str__(self):
+        return self.name
 
 
 class Product(models.Model):
@@ -74,7 +73,7 @@ class Product(models.Model):
     is_available = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     description = models.TextField()
-    # category = models.ManyToManyField(Category, related_name='products')
+    categories = models.ManyToManyField(Category, blank=True, related_name='products')
     # image = models.ImageField(upload_to=product_image)
 
 
@@ -82,3 +81,5 @@ class Product(models.Model):
 def update_is_available(sender, instance, **kwargs):
     if instance.quantity > 0:
         instance.is_available = True
+
+
