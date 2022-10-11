@@ -3,10 +3,21 @@ from core.models import Product, Category
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    products = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='shop:product-detail'
+    )
+    products_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('id', 'name', 'products', 'products_count',)
+        read_only_fields = ('id', 'count',)
+
+    def get_products_count(self, obj):
+        counter = Product.objects.filter(categories=obj).count()
+        return counter
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -15,7 +26,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-        read_only_fields = ['id', 'user', 'created', 'is_available']
+        read_only_fields = ('id', 'user', 'created', 'is_available')
 
     def create(self, validated_data):
         categories = validated_data.pop('categories', [])

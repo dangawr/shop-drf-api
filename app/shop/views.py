@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from core.models import Product
-from .serializers import ProductSerializer
+from core.models import Product, Category
+from .serializers import ProductSerializer, CategorySerializer
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.authentication import TokenAuthentication
 
@@ -13,3 +13,10 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    authentication_classes = [TokenAuthentication]
