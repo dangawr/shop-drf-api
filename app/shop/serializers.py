@@ -43,18 +43,20 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItem
-        fields = '__all__'
-        extra_kwargs = {
-            'cart': {'read_only': True}
-        }
+        fields = ('id', 'product', 'quantity')
 
     def create(self, validated_data):
         cart, created = Cart.objects.get_or_create(user=self.context['request'].user)
         return CartItem.objects.create(cart=cart, **validated_data)
 
 
-# class CartSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Cart
-#         fields = '__all__'
+class CartSerializer(serializers.ModelSerializer):
+    cart_items = CartItemSerializer(many=True)
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Cart
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'read_only': True}
+        }

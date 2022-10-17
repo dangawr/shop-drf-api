@@ -1,9 +1,10 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
 from core.models import Product, Category, CartItem, Cart
-from .serializers import ProductSerializer, CategorySerializer, CartItemSerializer
+from .serializers import ProductSerializer, CategorySerializer, CartItemSerializer, CartSerializer
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.authentication import TokenAuthentication
 from .permissions import IsCartItemOwner
+from django.shortcuts import get_object_or_404
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -32,10 +33,9 @@ class CartItemViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(cart__user=self.request.user)
 
 
-# class CartViewSet(mixins.CreateModelMixin,
-#                   mixins.ListModelMixin,
-#                   mixins.RetrieveModelMixin,
-#                   viewsets.GenericViewSet):
-#
-#     queryset = Cart.objects.all()
-#     serializer_class = Cart
+class CartApiView(generics.RetrieveDestroyAPIView):
+
+    serializer_class = CartSerializer
+
+    def get_object(self):
+        return get_object_or_404(Cart, user=self.request.user)
