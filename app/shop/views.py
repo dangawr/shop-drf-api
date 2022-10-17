@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from core.models import Product, Category
-from .serializers import ProductSerializer, CategorySerializer
+from core.models import Product, Category, CartItem
+from .serializers import ProductSerializer, CategorySerializer, CartItemSerializer, CartItemCreateSerializer
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.authentication import TokenAuthentication
 
@@ -20,3 +20,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [TokenAuthentication]
+
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'create' or self.action == 'update':
+            return CartItemCreateSerializer
+        return self.serializer_class

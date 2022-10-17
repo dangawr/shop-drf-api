@@ -83,3 +83,14 @@ def update_is_available(sender, instance, **kwargs):
         instance.is_available = True
 
 
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items', null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cart_items', null=True)
+    quantity = models.PositiveIntegerField(default=1)
+
+
+
