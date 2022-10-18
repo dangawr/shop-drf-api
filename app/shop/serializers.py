@@ -57,6 +57,8 @@ class CartItemSerializer(serializers.ModelSerializer):
         product = Product.objects.get(pk=validated_data['product'].pk)
         if not product.is_available:
             raise serializers.ValidationError('Sorry, this product is not available')
+        if validated_data['product'].quantity < validated_data['quantity']:
+            raise serializers.ValidationError('Sorry, this quantity is not available!')
         cart, created = Cart.objects.get_or_create(user=self.context['request'].user)
         return CartItem.objects.create(cart=cart, **validated_data)
 
@@ -106,5 +108,8 @@ class OrderSerializer(serializers.ModelSerializer):
         order = Order.objects.create(user=self.context['request'].user)
         for cart_item in cart.cart_items.all():
             OrderItem.objects.create(product=cart_item.product, quantity=cart_item.quantity, order=order)
+            cart_item.product.quantity -= cart_item.quantity
+            cart_item.product.save()
+        cart.delete()
         return order
 

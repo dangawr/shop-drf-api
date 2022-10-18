@@ -80,7 +80,9 @@ class Product(models.Model):
 @receiver(post_save, sender=Product)
 def update_is_available(sender, instance, **kwargs):
     if instance.quantity > 0:
-        instance.is_available = True
+        Product.objects.filter(pk=instance.pk).update(is_available=True)
+    else:
+        Product.objects.filter(pk=instance.pk).update(is_available=False)
 
 
 class Cart(models.Model):
