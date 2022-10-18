@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins, generics
-from core.models import Product, Category, CartItem, Cart
-from .serializers import ProductSerializer, CategorySerializer, CartItemSerializer, CartSerializer
+from core.models import Product, Category, CartItem, Cart, OrderItem, Order
+from .serializers import ProductSerializer, CategorySerializer, CartItemSerializer, CartSerializer, OrderSerializer
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.authentication import TokenAuthentication
 from .permissions import IsCartItemOwner
@@ -34,8 +34,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
 
 
 class CartApiView(generics.RetrieveDestroyAPIView):
-
     serializer_class = CartSerializer
 
     def get_object(self):
         return get_object_or_404(Cart, user=self.request.user)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+

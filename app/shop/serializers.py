@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Product, Category, Cart, CartItem
+from core.models import Product, Category, Cart, CartItem, Order, OrderItem
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -39,6 +39,14 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
 
+class ProductOrderItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'price')
+        read_only_fields = ('id', 'name', 'price')
+
+
 class CartItemSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -60,3 +68,40 @@ class CartSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'user': {'read_only': True}
         }
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductOrderItemSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = ('product', 'quantity')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_items = OrderItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ('id', 'user', 'order_items', 'total_price', 'created_at', 'updated_at')
+        read_only_fields = fields
+
+    def get_total_price(self, obj):
+        order_items = OrderItem.objects.filter(order=obj.pk)
+        total = 0
+        for order_item in order_items:
+            total += (order_item.product.price * order_item.quantity)
+        return total
+
+    def create(self, validated_data):
+        try:
+            cart = Cart.objects.get(user=self.context['request'].user)
+        except Exception as e:
+            error = {'message': ",".join(e.args) if len(e.args) > 0 else 'Unknown Error'}
+            raise serializers.ValidationError(error)
+        order = Order.objects.create(user=self.context['request'].user)
+        for cart_item in cart.cart_items.all():
+            OrderItem.objects.create(product=cart_item.product, quantity=cart_item.quantity, order=order)
+        return order
+
