@@ -54,6 +54,9 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'product', 'quantity')
 
     def create(self, validated_data):
+        product = Product.objects.get(pk=validated_data['product'].pk)
+        if not product.is_available:
+            raise serializers.ValidationError('Sorry, this product is not available')
         cart, created = Cart.objects.get_or_create(user=self.context['request'].user)
         return CartItem.objects.create(cart=cart, **validated_data)
 
