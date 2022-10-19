@@ -46,6 +46,7 @@ class PrivateUserTests(APITestCase):
             'price': Decimal('10.99'),
             'description': 'some test description'
         }
+        self.user.is_staff = True
         response = self.client.post(reverse('shop:product-list'), payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         product = Product.objects.get(id=response.data['id'])
@@ -76,6 +77,7 @@ class PrivateUserTests(APITestCase):
             'description': 'some test description',
             'categories': [{'name': self.category.name}]
         }
+        self.user.is_staff = True
         response = self.client.post(reverse('shop:product-list'), product_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

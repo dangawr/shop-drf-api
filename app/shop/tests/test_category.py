@@ -39,6 +39,7 @@ class PrivateUserTests(APITestCase):
         payload = {
             'name': 'test_name_category',
         }
+        self.user.is_staff = True
         response = self.client.post(reverse('shop:category-list'), payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         category = Category.objects.get(id=response.data['id'])
