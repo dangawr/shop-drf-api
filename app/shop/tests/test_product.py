@@ -52,7 +52,7 @@ class PrivateUserTests(APITestCase):
         self.assertEqual(product.user, self.user)
         for k, v in payload.items():
             self.assertEqual(getattr(product, k), v)
-        self.assertTrue(response.data['is_available'])
+        self.assertTrue(product.is_available)
 
     def test_update_is_available(self):
         payload = {
@@ -64,8 +64,9 @@ class PrivateUserTests(APITestCase):
         product = Product.objects.create(user=self.user, **payload)
 
         updated_quantity = {'quantity': 0}
-        response = self.client.patch(reverse('shop:product-detail', args=[product.pk]), updated_quantity)
-        self.assertFalse(response.data['is_available'])
+        self.client.patch(reverse('shop:product-detail', args=[product.pk]), updated_quantity)
+
+        self.assertFalse(product.is_available)
 
     def test_create_product_with_existing_category(self):
         product_payload = {

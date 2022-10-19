@@ -20,8 +20,15 @@ class CategorySerializer(serializers.ModelSerializer):
         return counter
 
 
+class ProductCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name',)
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    categories = CategorySerializer(many=True, required=False)
+    categories = ProductCategorySerializer(many=True, required=False)
 
     class Meta:
         model = Product

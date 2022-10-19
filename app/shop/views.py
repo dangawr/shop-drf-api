@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from rest_framework.authentication import TokenAuthentication
 from .permissions import IsCartItemOwner
 from django.shortcuts import get_object_or_404
+from rest_framework import filters
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -12,6 +13,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [TokenAuthentication]
+    filterset_fields = ['name', 'categories']
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['quantity', 'price']
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
