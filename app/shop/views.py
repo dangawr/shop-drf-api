@@ -1,7 +1,7 @@
 from rest_framework import viewsets, generics
 from core.models import Product, Category, CartItem, Cart, Order
 from .serializers import ProductSerializer, CategorySerializer, CartItemSerializer, CartSerializer, OrderSerializer, OrderUpdateSerializer
-from .permissions import IsAuthenticatedOrStaff, IsStaffOrReadOnly, IsStaff
+from .permissions import IsStaffOrReadOnly, IsStaff
 from django.shortcuts import get_object_or_404
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
