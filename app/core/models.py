@@ -99,11 +99,18 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    DELIVERY_STATUS = (
+        ('Waiting for payment', 'Waiting for payment'),
+        ('Collecting order', 'Collecting order'),
+        ('Sent', 'Sent'),
+    )
+    delivery_status = models.CharField(max_length=100, choices=DELIVERY_STATUS, default='Waiting for payment')
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
     quantity = models.PositiveIntegerField(default=0)
+
 
 

@@ -96,7 +96,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'user', 'order_items', 'total_price', 'created_at', 'updated_at')
+        fields = ('id', 'user', 'order_items', 'total_price', 'delivery_status', 'created_at', 'updated_at')
         read_only_fields = fields
 
     def get_total_price(self, obj):
@@ -119,4 +119,13 @@ class OrderSerializer(serializers.ModelSerializer):
             cart_item.product.save()
         cart.delete()
         return order
+
+
+class OrderUpdateSerializer(OrderSerializer):
+
+    class Meta:
+        model = Order
+        fields = ('id', 'user', 'order_items', 'total_price', 'delivery_status', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'user', 'order_items', 'total_price', 'created_at', 'updated_at')
+
 
