@@ -4,6 +4,7 @@ from .serializers import ProductSerializer, CategorySerializer, CartItemSerializ
 from .permissions import IsAuthenticatedOrStaff, IsStaffOrReadOnly, IsStaff
 from django.shortcuts import get_object_or_404
 from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -12,7 +13,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsStaffOrReadOnly]
     filterset_fields = ['name', 'categories']
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     ordering_fields = ['quantity', 'price']
 
     def perform_create(self, serializer):
