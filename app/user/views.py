@@ -8,10 +8,12 @@ from rest_framework import status
 
 
 class CreateUserApiView(CreateAPIView):
+    """Endpoint for create account."""
     serializer_class = UserSerializer
 
 
 class CustomAuthToken(ObtainAuthToken):
+    """Endpoint for receiving token."""
     serializer_class = TokenSerializer
 
     def post(self, request, *args, **kwargs):
@@ -28,6 +30,7 @@ class CustomAuthToken(ObtainAuthToken):
 
 
 class UpdateUserDetailsApiView(RetrieveUpdateAPIView):
+    """Endpoint for update user data."""
     serializer_class = UserUpdateSerializer
 
     def get_object(self):
@@ -35,6 +38,7 @@ class UpdateUserDetailsApiView(RetrieveUpdateAPIView):
 
 
 class LogOutUserApiView(APIView):
+    """Endpoint for logout user."""
 
     def get(self, request):
         request.user.auth_token.delete()

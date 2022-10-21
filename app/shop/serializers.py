@@ -16,12 +16,15 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'count',)
 
     def get_products_count(self, obj):
+        """Counts the number of products in a category."""
         counter = Product.objects.filter(categories=obj).count()
         return counter
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-
+    """
+    Nested product serializer in CategorySerializer.
+    """
     class Meta:
         model = Category
         fields = ('id', 'name',)
@@ -36,6 +39,9 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'user', 'created', 'is_available')
 
     def create(self, validated_data):
+        """
+        Create or get existing category.
+        """
         categories = validated_data.pop('categories', [])
         product = Product.objects.create(**validated_data)
         for category in categories:
@@ -47,7 +53,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductOrderItemSerializer(serializers.ModelSerializer):
-
+    """
+    Nested product serializer in OrderItemSerializer.
+    """
     class Meta:
         model = Product
         fields = ('id', 'name', 'price')
@@ -61,6 +69,9 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'product', 'quantity')
 
     def create(self, validated_data):
+        """
+        Checks if product is available and adds it to user cart.
+        """
         product = Product.objects.get(pk=validated_data['product'].pk)
         if not product.is_available:
             raise serializers.ValidationError('Sorry, this product is not available')
@@ -100,6 +111,9 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_total_price(self, obj):
+        """
+        Count total price of order.
+        """
         order_items = OrderItem.objects.filter(order=obj.pk)
         total = 0
         for order_item in order_items:
@@ -107,6 +121,9 @@ class OrderSerializer(serializers.ModelSerializer):
         return total
 
     def create(self, validated_data):
+        """
+        Checks if user cart exist, then creates order and adds products from cart.
+        """
         try:
             cart = Cart.objects.get(user=self.context['request'].user)
         except Exception as e:
