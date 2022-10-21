@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics, mixins
+from rest_framework import viewsets, generics, mixins, status
 from core.models import Product, Category, CartItem, Cart, Order
 from .serializers import (
     ProductSerializer,
@@ -6,13 +6,17 @@ from .serializers import (
     CartItemSerializer,
     CartSerializer,
     OrderSerializer,
-    OrderUpdateSerializer)
+    OrderUpdateSerializer,
+    ProductImageSerializer
+)
 from .permissions import IsStaffOrReadOnly, IsStaff
 from django.shortcuts import get_object_or_404
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 @extend_schema(
@@ -33,6 +37,22 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == 'upload_image':
+            return ProductImageSerializer
+        return self.serializer_class
+
+    @action(methods=['POST'], detail=True, url_path='upload-image')
+    def upload_image(self, request, pk=None):
+        recipe = self.get_object()
+        serializer = self.get_serializer(recipe, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(
