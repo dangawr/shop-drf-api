@@ -4,3 +4,4 @@ psycopg2>=2.8.6,<2.9
 django-filter>=22.1,<22.2
 drf-spectacular>=0.24.2,<0.25
 Pillow>=9.2.0,<9.3.0
+uwsgi>=2.0.19,<2.1
