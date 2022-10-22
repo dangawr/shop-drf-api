@@ -11,6 +11,7 @@ Simple shop REST API project that allows to add shop products to user's cart and
 Please use Token authentication. 
 
 Sample account to get token - e-mail: test@example.com, pass: test123
+
 Or just use token - afaceded40153ddbec6b0d8ad619ac737a9c1023
 
 ## Technologies Used
